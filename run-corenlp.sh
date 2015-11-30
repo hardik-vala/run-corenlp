@@ -2,7 +2,9 @@
 
 # Author: Hardik
 
-# TODO: Print usage message on erroneous output.
+usage() {
+	echo -e "Usage:$0 [-h] -c <CoreNLP path> -t <Filelist path> -o <Output directory path> -l <Log filepath>"
+}
 
 # Parse arguments.
 while [[ $@ > 0 ]]
@@ -10,6 +12,11 @@ do
 	key=$1
 	
 	case $1 in
+		-h|--help)
+		# Display usage.
+		usage
+		exit 0
+		;;
 		-c|--corenlp)
 		# Path to directory with CoreNLP .jar's.
 		CORENLP_DIRPATH=$2
@@ -31,13 +38,21 @@ do
 		shift
 		;;
 		*)
-		# (Unkwown parameter)
+		# Unknown parameter.
+		usage
+		exit 1
 		;;
 	esac
 	shift
 done
 
-java -cp $CORENLP_DIRPATH/stanford-corenlp-3.5.2.jar:$CORENLP_DIRPATH/stanford-corenlp-3.5.2-models.jar:xom.jar:$CORENLP_DIRPATH/joda-time.jar:$CORENLP_DIRPATH/jollyday.jar:$CORENLP_DIRPATH/ejml-0.23.jar -Xmx16g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,ner,parse -filelist $FILELIST_PATH -outputDirectory $OUTPUT_DIRPATH -replaceExtension &> $LOG_PATH
+if [[ -z $CORENLP_DIRPATH || -z $FILELIST_PATH || -z $OUTPUT_DIRPATH || -z $LOG_PATH ]]
+then
+	usage
+	exit 1
+fi
+
+java -cp $CORENLP_DIRPATH/stanford-corenlp-3.5.2.jar:$CORENLP_DIRPATH/stanford-corenlp-3.5.2-models.jar:$CORENLP_DIRPATH/xom.jar:$CORENLP_DIRPATH/joda-time.jar:$CORENLP_DIRPATH/jollyday.jar:$CORENLP_DIRPATH/ejml-0.23.jar -Xmx16g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,ner,parse -filelist $FILELIST_PATH -outputDirectory $OUTPUT_DIRPATH -outputFormat xml -replaceExtension &> $LOG_PATH
 
 # Remove the filelist when done.
 rm -f $FILELIST_PATH

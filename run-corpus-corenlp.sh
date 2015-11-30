@@ -2,7 +2,9 @@
 
 # Author: Hardik
 
-# TODO: Print usage message on erroneous input.
+usage() {
+	echo -e "Usage:$0 [-h] -c <CoreNLP path> -t <Corpus path> -o <Output directory path> -l <Log directory path> -n <# Processes> [-f]"
+}
 
 # Parse arguments.
 while [[ $@ > 0 ]]
@@ -10,6 +12,11 @@ do
 	key=$1
 	
 	case $1 in
+		-h|--help)
+		# Display usage.
+		usage
+		exit 0
+		;;
 		-f|--force)
 		# Force re-running CoreNLP over texts already with CoreNLP output files.
 		FORCE=true
@@ -40,11 +47,19 @@ do
 		shift
 		;;
 		*)
-		# (Unknown parameter)
+		# Unknown parameter.
+		usage
+		exit 1
 		;;
 	esac
 	shift
 done
+
+if [[ -z $CORENLP_DIRPATH || -z $TEXTS_DIRPATH || -z $OUTPUT_DIRPATH || -z $LOGS_DIRPATH || -z $NPROC ]]
+then
+	usage
+	exit 1
+fi
 
 # Random Id to attached to file list filenames.
 exid=$(cat /proc/sys/kernel/random/uuid)
