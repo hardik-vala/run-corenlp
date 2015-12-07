@@ -71,7 +71,7 @@ i=0
 for text_path in $(find $TEXTS_DIRPATH -name '*.txt')
 do
 	filename=$(basename $text_path)	
-	if [[ ! -f "$OUTPUT_DIRPATH/${filename%.*}.out" || $FORCE ]]
+	if [[ ! -f "$OUTPUT_DIRPATH/${filename%.*}.xml" || $FORCE ]]
 	then
 		r=`expr $i % $NPROC`
 		# File lists are created in the current directory.
